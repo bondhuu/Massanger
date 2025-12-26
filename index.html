@@ -13,7 +13,7 @@
         .in { width: 90%; padding: 10px; margin: 8px 0; border: 1px solid #999; border-radius: 4px; box-sizing: border-box; }
         .btn { background: #25d366; color: #fff; padding: 12px; width: 95%; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-        /* Chat Area (Hidden by default) */
+        /* Chat Area */
         #chat_box { display: none; }
         .top-locked { 
             background: #f0f0f0; 
@@ -26,7 +26,22 @@
         .msg-in { width: 62%; padding: 8px; border: 1px solid #ccc; font-size: 14px; border-radius: 4px; box-sizing: border-box; }
         .send-btn { width: 30%; padding: 8px; background: #075e54; color: #fff; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; float: right; }
 
-        .tools { font-size: 11px; margin-top: 8px; clear: both; background: #fff; padding: 5px; border: 1px solid #ddd; }
+        .tools { font-size: 12px; margin-top: 8px; clear: both; background: #fff; padding: 8px; border: 1px solid #ddd; overflow: hidden; }
+        
+        /* লম্বা রিফ্রেশ বাটন */
+        .refresh-btn { 
+            width: 100%; 
+            background: #34b7f1; 
+            color: white; 
+            border: none; 
+            padding: 10px; 
+            margin-top: 8px; 
+            font-weight: bold; 
+            border-radius: 4px; 
+            cursor: pointer;
+            display: block;
+            text-align: center;
+        }
 
         /* Messages */
         #messages { padding: 10px; }
@@ -55,7 +70,9 @@
         
         <div class="tools">
             History: <select id="m_sel" onchange="load()"></select>
-            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 6px; border-radius:3px; cursor:pointer;">Exit</button>
+            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:4px 10px; border-radius:3px; cursor:pointer;">Exit</button>
+            
+            <button class="refresh-btn" onclick="load()">🔄 REFRESH (নতুন মেসেজ দেখুন)</button>
         </div>
     </div>
     <div id="messages"></div>
@@ -82,21 +99,18 @@
         var a = document.getElementById('id1').value.trim();
         var b = document.getElementById('id2').value.trim();
         if(a==""||b=="") { return; }
-        // Redirect with URL params for reload persistence
-        window.location.href = window.location.pathname + "?s1=" + encodeURIComponent(a) + "&s2=" + encodeURIComponent(b);
+        window.location.href = window.location.pathname + "?s1=" + encodeURIComponent(a) + "?s2=" + encodeURIComponent(b);
     }
 
     function initChat(a, b) {
         var p = [a,b].sort();
         _uid = btoa(p[0]+p[1]).replace(/=/g, "");
         _un = a.split('-')[0];
-        
         document.getElementById('l_area').style.display = 'none';
         document.getElementById('chat_box').style.display = 'block';
-        
         setupDropdown();
         load();
-        setInterval(load, 10000);
+        // অটো রিফ্রেশ (setInterval) বন্ধ করে দেওয়া হয়েছে ডাটা বাঁচানোর জন্য
     }
 
     function setupDropdown() {
@@ -120,6 +134,7 @@
         x.open("POST", atob(_0xdb)+_uid+"/"+m+".json", true);
         x.send(JSON.stringify({"u":_un,"m":t}));
         document.getElementById('m_text').value="";
+        // মেসেজ পাঠানোর ১.৫ সেকেন্ড পর অটো লোড হবে যাতে নিজের পাঠানো মেসেজ দেখা যায়
         setTimeout(load, 1500);
     }
 
