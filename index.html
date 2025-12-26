@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bondhu Messenger - International Edition</title>
+    <title>Bondhu Messenger - Save Data Version</title>
     <style>
         body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; }
         .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; }
@@ -28,7 +28,7 @@
 
         .tools { font-size: 12px; margin-top: 8px; clear: both; background: #fff; padding: 8px; border: 1px solid #ddd; }
         
-        /* Full-width Refresh Button */
+        /* Refresh Button */
         .refresh-btn { 
             width: 100%; 
             background: #34b7f1; 
@@ -66,7 +66,7 @@
 
 <div id="chat_box">
     <div class="top-locked">
-        <input type="text" id="m_text" class="msg-in" placeholder="Message...">
+        <input type="text" id="m_text" class="msg-in" placeholder="Write...">
         <button class="send-btn" onclick="send()">SEND</button>
         
         <div class="tools">
@@ -75,7 +75,7 @@
             
             <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:4px 12px; border-radius:3px; cursor:pointer; font-weight:bold;">Exit</button>
             
-            <button class="refresh-btn" onclick="load()">🔄 REFRESH (Check New Messages)</button>
+            <button class="refresh-btn" onclick="load()">NEW MESSAGES</button>
         </div>
     </div>
     <div id="messages"></div>
@@ -115,7 +115,6 @@
         
         setupDropdown();
         load();
-        // Auto-refresh disabled to save mobile data (MB)
     }
 
     function setupDropdown() {
