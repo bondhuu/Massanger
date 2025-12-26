@@ -8,30 +8,29 @@
         body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; }
         .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; }
         
-        /* Login Area - Clean Style */
-        .login-box { background: #fff; margin: 15px; padding: 15px; border: 1px solid #ccc; text-align: center; }
-        .in { width: 90%; padding: 10px; margin: 5px 0; border: 1px solid #999; border-radius: 2px; }
-        .btn { background: #25d366; color: #fff; padding: 10px; width: 95%; font-weight: bold; border: none; cursor: pointer; }
+        /* Login Area */
+        .login-box { background: #fff; margin: 15px; padding: 15px; border: 1px solid #ccc; text-align: center; border-radius: 5px; }
+        .in { width: 90%; padding: 10px; margin: 5px 0; border: 1px solid #999; border-radius: 3px; box-sizing: border-box; }
+        .btn { background: #25d366; color: #fff; padding: 10px; width: 95%; font-weight: bold; border: none; border-radius: 3px; cursor: pointer; margin-top: 10px; }
 
-        /* Chat UI Sticky Top */
+        /* Chat Area */
         .top-locked { 
             background: #f0f0f0; 
             padding: 10px; 
             border-bottom: 2px solid #ccc; 
-            position: -webkit-sticky; 
             position: sticky; 
             top: 0; 
             z-index: 100;
         }
-        .msg-in { width: 62%; padding: 8px; border: 1px solid #ccc; font-size: 14px; }
-        .send-btn { width: 30%; padding: 8px; background: #075e54; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+        .msg-in { width: 62%; padding: 8px; border: 1px solid #ccc; font-size: 14px; border-radius: 3px; box-sizing: border-box; }
+        .send-btn { width: 30%; padding: 8px; background: #075e54; color: #fff; border: none; font-weight: bold; border-radius: 3px; cursor: pointer; float: right; }
 
-        .tools { font-size: 11px; margin-top: 5px; background: #fff; padding: 5px; border: 1px solid #ddd; }
+        .tools { font-size: 11px; margin-top: 8px; clear: both; background: #fff; padding: 5px; border: 1px solid #ddd; border-radius: 3px; }
 
-        /* Message Bubbles */
+        /* Messages */
         #messages { padding: 10px; }
         .msg-row { width: 100%; margin-bottom: 8px; clear: both; overflow: hidden; }
-        .bubble { padding: 10px; border-radius: 8px; border: 1px solid #bbb; display: inline-block; max-width: 80%; word-wrap: break-word; font-size: 14px; position: relative; }
+        .bubble { padding: 10px; border-radius: 8px; border: 1px solid #bbb; display: inline-block; max-width: 80%; word-wrap: break-word; font-size: 14px; }
         .sent { background: #dcf8c6; float: right; } 
         .recd { background: #ffffff; float: left; }
         .u-name { font-size: 10px; color: #075e54; font-weight: bold; display: block; margin-bottom: 3px; }
@@ -55,10 +54,9 @@
         
         <div class="tools">
             History: <select id="m_sel" onchange="load()"></select>
-            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 5px; cursor:pointer;">Exit</button>
+            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 6px; border-radius:3px; cursor:pointer;">Exit</button>
         </div>
     </div>
-
     <div id="messages"></div>
 </div>
 
@@ -66,7 +64,6 @@
     var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
     var _uid = ""; var _un = "";
 
-    // URL parameter parsing
     function getQ(name) {
         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
         return match && decodeURIComponent(match[1]);
@@ -84,7 +81,7 @@
         var a = document.getElementById('id1').value.trim();
         var b = document.getElementById('id2').value.trim();
         if(a==""||b=="") return;
-        // রিলোড সমস্যা সমাধানের জন্য URL-এ ডাটা সেট করা
+        // URL based redirect for persistence
         window.location.href = window.location.pathname + "?s1=" + encodeURIComponent(a) + "&s2=" + encodeURIComponent(b);
     }
 
@@ -93,7 +90,6 @@
         _uid = btoa(p[0]+p[1]).replace(/=/g, "");
         _un = a.split('-')[0];
         
-        // লগইন বক্স লুকানো এবং চ্যাট বক্স দেখানো
         document.getElementById('l_area').style.display='none';
         document.getElementById('chat_box').style.display='block';
         
@@ -147,263 +143,6 @@
 
     function logout() {
         window.location.href = window.location.pathname;
-    }
-</script>
-</body>
-</html>
-nction logout() {
-        window.location.href = window.location.pathname;
-    }
-</script>
-</body>
-</html>
-<div id="chat_box" style="display:none;">
-    <div class="top">
-        <input type="text" id="m_text" class="msg-in" placeholder="Write...">
-        <button class="send-btn" onclick="send()">SEND</button>
-        <div style="margin-top:5px;">
-            <button onclick="location.reload()" style="font-size:11px;">Refresh</button>
-            <button onclick="logout()" style="float:right; color:red; font-size:11px;">Logout</button>
-        </div>
-    </div>
-    <div id="messages"></div>
-</div>
-
-<script>
-    var _base = "https://bondhu-489ea-default-rtdb.firebaseio.com/secure_chats/";
-    var _uid = ""; var _un = "";
-
-    // অপেরা মিনির জন্য সহজ URL রিডিং
-    var q = window.location.search;
-    if(q.indexOf('s1=') > -1 && q.indexOf('s2=') > -1) {
-        var params = q.substring(1).split('&');
-        var s1 = params[0].split('=')[1];
-        var s2 = params[1].split('=')[1];
-        
-        if(s1 && s2) {
-            _un = decodeURIComponent(s1).split('-')[0];
-            var p = [decodeURIComponent(s1), decodeURIComponent(s2)].sort();
-            _uid = p[0] + p[1];
-            
-            document.getElementById('l_area').style.display = 'none';
-            document.getElementById('chat_box').style.display = 'block';
-            load();
-        }
-    }
-
-    function send() {
-        var t = document.getElementById('m_text').value;
-        if(t == "") return;
-        var m = new Date().getFullYear() + "_" + (new Date().getMonth() + 1);
-        var x = new XMLHttpRequest();
-        x.open("POST", _base + _uid + "/" + m + ".json", true);
-        x.onreadystatechange = function() { if(x.readyState == 4) load(); };
-        x.send(JSON.stringify({"u":_un, "m":t}));
-        document.getElementById('m_text').value = "";
-    }
-
-    function load() {
-        if(_uid == "") return;
-        var m = new Date().getFullYear() + "_" + (new Date().getMonth() + 1);
-        var x = new XMLHttpRequest();
-        x.open("GET", _base + _uid + "/" + m + ".json", true);
-        x.onreadystatechange = function() {
-            if(x.readyState == 4 && x.status == 200) {
-                var res = JSON.parse(x.responseText);
-                var h = "";
-                for(var k in res) { 
-                    var type = (res[k].u == _un) ? "sent" : "recd";
-                    h = "<div class='msg-row'><div class='bubble "+type+"'><span class='u-name'>"+res[k].u+"</span>"+res[k].m+"</div></div>" + h; 
-                }
-                document.getElementById('messages').innerHTML = h || "<center>No messages</center>";
-            }
-        };
-        x.send();
-    }
-
-    function logout() {
-        window.location.href = window.location.pathname;
-    }
-</script>
-</body>
-</html>
-    <div class="top">
-        <input type="text" id="m_text" class="msg-in" placeholder="Write...">
-        <button class="send-btn" onclick="send()">SEND</button>
-        <div style="font-size:11px; margin-top:5px;">
-            <button onclick="load()" style="background:#eee; border:1px solid #999;">Refresh Messages</button>
-            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 4px;">Logout</button>
-        </div>
-    </div>
-    <div id="messages"></div>
-</div>
-
-<script>
-    var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
-    var _uid = ""; var _un = "";
-
-    function getQ(name) {
-        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-        return match && decodeURIComponent(match[1]);
-    }
-
-    window.onload = function() {
-        var s1 = getQ('s1'); 
-        var s2 = getQ('s2'); 
-        
-        if(s1 && s2) {
-            document.getElementById('id1').value = s1;
-            document.getElementById('id2').value = s2;
-            
-            var p = [s1, s2].sort();
-            _uid = p[0] + p[1]; 
-            _un = s1.split('-')[0];
-            
-            document.getElementById('l_area').style.display='none';
-            document.getElementById('chat_box').style.display='block';
-            load();
-            setInterval(load, 10000);
-        }
-    };
-
-    function start() {
-        var a = document.getElementById('id1').value;
-        var b = document.getElementById('id2').value;
-        if(a=="" || b=="") return;
-        
-        window.location.href = window.location.pathname + "?s1=" + encodeURIComponent(a) + "&s2=" + encodeURIComponent(b);
-    }
-
-    function send() {
-        var t = document.getElementById('m_text').value;
-        if(t=="") return;
-        var d = new Date();
-        var m = d.getFullYear() + "_" + (d.getMonth() + 1);
-        var x = new XMLHttpRequest();
-        x.open("POST", atob(_0xdb)+_uid+"/"+m+".json", true);
-        x.onreadystatechange = function() { if(x.readyState==4) load(); };
-        x.send(JSON.stringify({"u":_un,"m":t}));
-        document.getElementById('m_text').value="";
-    }
-
-    function load() {
-        if(_uid=="") return;
-        var d = new Date();
-        var m = d.getFullYear() + "_" + (d.getMonth() + 1);
-        var x = new XMLHttpRequest();
-        x.open("GET", atob(_0xdb)+_uid+"/"+m+".json", true);
-        x.onreadystatechange = function() {
-            if(x.readyState==4 && x.status==200){
-                var res = JSON.parse(x.responseText);
-                var h = "";
-                for(var k in res){ 
-                    var type = (res[k].u == _un) ? "sent" : "recd";
-                    h = "<div class='msg-row'><div class='bubble "+type+"'><span class='u-name'>"+res[k].u+"</span>"+res[k].m+"</div></div>" + h; 
-                }
-                document.getElementById('messages').innerHTML = h || "<center>No messages</center>";
-            }
-        };
-        x.send();
-    }
-
-    function logout() {
-        window.location.href = window.location.pathname;
-    }
-</script>
-</body>
-</html>
-    <div class="top-locked">
-        <input type="text" id="m_text" class="msg-in" placeholder="Write...">
-        <button class="send-btn" onclick="send()">SEND</button>
-        <div style="font-size:11px; margin-top:5px;">
-            History: <select id="m_sel" onchange="load()"></select>
-            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 5px;">Exit</button>
-        </div>
-    </div>
-    <div id="messages"></div>
-</div>
-
-<script>
-    var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
-    var _uid = ""; var _un = "";
-
-    // URL থেকে ডাটা পড়ার ফাংশন
-    function getParam(name) {
-        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-        return (results == null) ? null : results[1] || 0;
-    }
-
-    window.onload = function() {
-        var u = getParam('u'); // URL এ u আছে কিনা দেখবে
-        var n = getParam('n'); // URL এ n আছে কিনা দেখবে
-        
-        if(u && n) {
-            _uid = u;
-            _un = n;
-            showUI();
-        }
-    };
-
-    function start() {
-        var a = document.getElementById('id1').value;
-        var b = document.getElementById('id2').value;
-        if(a==""||b=="") return;
-        
-        var p = [a,b].sort();
-        var temp_uid = p[0] + p[1];
-        var temp_un = a.split('-')[0];
-
-        // লগইন করার পর URL পরিবর্তন করে দিবে (যাতে রিলোড দিলে ডাটা থাকে)
-        window.location.href = window.location.pathname + "?u=" + temp_uid + "&n=" + temp_un;
-    }
-
-    function showUI() {
-        document.getElementById('l_area').style.display='none';
-        document.getElementById('chat_box').style.display='block';
-        
-        var sel = document.getElementById('m_sel');
-        var d = new Date();
-        var v = d.getFullYear()+"_"+(d.getMonth()+1);
-        var o = document.createElement('option');
-        o.value = v; o.innerHTML = v;
-        sel.appendChild(o);
-        
-        load();
-        setInterval(load, 10000);
-    }
-
-    function send() {
-        var t = document.getElementById('m_text').value;
-        var m = document.getElementById('m_sel').value;
-        if(t=="") return;
-        var x = new XMLHttpRequest();
-        x.open("POST", atob(_0xdb)+_uid+"/"+m+".json", true);
-        x.onreadystatechange = function() { if(x.readyState==4) load(); };
-        x.send(JSON.stringify({"u":_un,"m":t}));
-        document.getElementById('m_text').value="";
-    }
-
-    function load() {
-        if(_uid=="") return;
-        var m = document.getElementById('m_sel').value;
-        var x = new XMLHttpRequest();
-        x.open("GET", atob(_0xdb)+_uid+"/"+m+".json", true);
-        x.onreadystatechange = function() {
-            if(x.readyState==4 && x.status==200){
-                var res = JSON.parse(x.responseText);
-                var h = "";
-                for(var k in res){ 
-                    var type = (res[k].u == _un) ? "sent" : "recd";
-                    h = "<div class='msg-row'><div class='bubble "+type+"'><span class='u-name'>"+res[k].u+"</span>"+res[k].m+"</div></div>" + h; 
-                }
-                document.getElementById('messages').innerHTML = h || "<center>No messages</center>";
-            }
-        };
-        x.send();
-    }
-
-    function logout() {
-        window.location.href = window.location.pathname; // URL ক্লিয়ার করে লগআউট
     }
 </script>
 </body>
