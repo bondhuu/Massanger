@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bondhu Messenger</title>
+    <title>Bondhu Messenger - Save Data Version</title>
     <style>
         body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; }
         .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; }
@@ -26,7 +26,7 @@
         .msg-in { width: 62%; padding: 8px; border: 1px solid #ccc; font-size: 14px; border-radius: 4px; box-sizing: border-box; }
         .send-btn { width: 30%; padding: 8px; background: #075e54; color: #fff; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; float: right; }
 
-        .tools { font-size: 12px; margin-top: 8px; clear: both; background: #fff; padding: 8px; border: 1px solid #ddd; overflow: hidden; }
+        .tools { font-size: 12px; margin-top: 8px; clear: both; background: #fff; padding: 8px; border: 1px solid #ddd; }
         
         /* লম্বা রিফ্রেশ বাটন */
         .refresh-btn { 
@@ -34,13 +34,14 @@
             background: #34b7f1; 
             color: white; 
             border: none; 
-            padding: 10px; 
-            margin-top: 8px; 
+            padding: 12px; 
+            margin-top: 10px; 
             font-weight: bold; 
             border-radius: 4px; 
             cursor: pointer;
             display: block;
             text-align: center;
+            font-size: 14px;
         }
 
         /* Messages */
@@ -69,8 +70,10 @@
         <button class="send-btn" onclick="send()">SEND</button>
         
         <div class="tools">
-            History: <select id="m_sel" onchange="load()"></select>
-            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:4px 10px; border-radius:3px; cursor:pointer;">Exit</button>
+            <span style="font-weight:bold;">History:</span> 
+            <select id="m_sel" onchange="load()" style="padding:2px;"></select>
+            
+            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:4px 12px; border-radius:3px; cursor:pointer; font-weight:bold;">Exit</button>
             
             <button class="refresh-btn" onclick="load()">🔄 REFRESH (নতুন মেসেজ দেখুন)</button>
         </div>
@@ -79,9 +82,11 @@
 </div>
 
 <script>
+    // ডাটাবেজ লিঙ্ক এনকোড করা
     var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
     var _uid = ""; var _un = "";
 
+    // URL থেকে আইডি উদ্ধার করা
     function getQ(name) {
         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
         return match && decodeURIComponent(match[1]);
@@ -98,19 +103,22 @@
     function start() {
         var a = document.getElementById('id1').value.trim();
         var b = document.getElementById('id2').value.trim();
-        if(a==""||b=="") { return; }
-        window.location.href = window.location.pathname + "?s1=" + encodeURIComponent(a) + "?s2=" + encodeURIComponent(b);
+        if(a==""||b=="") { alert("Please enter IDs"); return; }
+        // লগইন করার পর URL এ প্যারামিটার সেট করা যাতে রিফ্রেশ করলে লগআউট না হয়
+        window.location.href = window.location.pathname + "?s1=" + encodeURIComponent(a) + "&s2=" + encodeURIComponent(b);
     }
 
     function initChat(a, b) {
         var p = [a,b].sort();
         _uid = btoa(p[0]+p[1]).replace(/=/g, "");
         _un = a.split('-')[0];
+        
         document.getElementById('l_area').style.display = 'none';
         document.getElementById('chat_box').style.display = 'block';
+        
         setupDropdown();
         load();
-        // অটো রিফ্রেশ (setInterval) বন্ধ করে দেওয়া হয়েছে ডাটা বাঁচানোর জন্য
+        // ডাটা সেভ করার জন্য setInterval (অটো রিফ্রেশ) এখানে বন্ধ রাখা হয়েছে।
     }
 
     function setupDropdown() {
@@ -134,7 +142,7 @@
         x.open("POST", atob(_0xdb)+_uid+"/"+m+".json", true);
         x.send(JSON.stringify({"u":_un,"m":t}));
         document.getElementById('m_text').value="";
-        // মেসেজ পাঠানোর ১.৫ সেকেন্ড পর অটো লোড হবে যাতে নিজের পাঠানো মেসেজ দেখা যায়
+        // মেসেজ পাঠানোর পর নিজে থেকেই একবার লোড হবে
         setTimeout(load, 1500);
     }
 
