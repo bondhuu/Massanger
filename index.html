@@ -2,24 +2,23 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Bondhu Messenger</title>
+    <title>Bondhu - Opera Edition</title>
     <style>
-        body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; font-size: 13px; }
-        .header { background: #075e54; color: #fff; padding: 8px; font-weight: bold; text-align: center; }
-        .box { background: #fff; margin: 10px; padding: 10px; border: 1px solid #999; text-align: center; }
-        .in { width: 90%; padding: 5px; margin: 5px 0; border: 1px solid #777; }
-        .btn { background: #25d366; color: #fff; padding: 8px; width: 95%; font-weight: bold; border: none; cursor: pointer; }
+        body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; font-size: 14px; }
+        .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; }
+        .box { background: #fff; margin: 10px; padding: 15px; border: 1px solid #999; text-align: center; }
+        .in { width: 90%; padding: 8px; margin: 5px 0; border: 1px solid #777; }
+        .btn { background: #25d366; color: #fff; padding: 10px; width: 95%; font-weight: bold; border: none; }
         
-        .top { background: #f0f0f0; padding: 8px; border-bottom: 2px solid #ccc; position: sticky; top: 0; z-index: 1000; }
-        .msg-in { width: 60%; padding: 5px; border: 1px solid #ccc; }
-        .send-btn { width: 30%; padding: 6px; background: #075e54; color: #fff; border: none; font-weight: bold; }
+        .top { background: #f0f0f0; padding: 10px; border-bottom: 2px solid #ccc; }
+        .msg-in { width: 60%; padding: 8px; border: 1px solid #ccc; }
+        .send-btn { width: 30%; padding: 8px; background: #075e54; color: #fff; border: none; }
         
-        #messages { padding: 8px; }
-        .msg-row { width: 100%; margin-bottom: 8px; clear: both; overflow: hidden; }
-        .bubble { padding: 6px; border-radius: 4px; border: 1px solid #bbb; display: inline-block; max-width: 80%; }
+        #messages { padding: 10px; }
+        .msg-row { width: 100%; margin-bottom: 10px; clear: both; overflow: hidden; }
+        .bubble { padding: 8px; border-radius: 5px; border: 1px solid #bbb; display: inline-block; max-width: 85%; background: #fff; }
         .sent { background: #dcf8c6; float: right; } 
-        .recd { background: #ffffff; float: left; }
-        .u-name { font-size: 10px; color: #075e54; font-weight: bold; display: block; }
+        .u-name { font-size: 11px; color: #075e54; font-weight: bold; display: block; }
     </style>
 </head>
 <body>
@@ -27,13 +26,84 @@
 <div class="header">Bondhu Messenger</div>
 
 <div id="l_area" class="box">
-    <b>Messenger Login</b><br>
-    <input type="text" id="id1" class="in" placeholder="My ID-Pin"><br>
-    <input type="text" id="id2" class="in" placeholder="Friend ID-Pin"><br>
-    <button class="btn" onclick="start()">START CHAT</button>
+    <b>Login to Chat</b><br>
+    <form action="" method="get">
+        <input type="text" name="s1" class="in" placeholder="My ID-Pin" required><br>
+        <input type="text" name="s2" class="in" placeholder="Friend ID-Pin" required><br>
+        <input type="submit" value="LOGIN" class="btn">
+    </form>
 </div>
 
 <div id="chat_box" style="display:none;">
+    <div class="top">
+        <input type="text" id="m_text" class="msg-in" placeholder="Write...">
+        <button class="send-btn" onclick="send()">SEND</button>
+        <div style="margin-top:5px;">
+            <button onclick="location.reload()" style="font-size:11px;">Refresh</button>
+            <button onclick="logout()" style="float:right; color:red; font-size:11px;">Logout</button>
+        </div>
+    </div>
+    <div id="messages"></div>
+</div>
+
+<script>
+    var _base = "https://bondhu-489ea-default-rtdb.firebaseio.com/secure_chats/";
+    var _uid = ""; var _un = "";
+
+    // অপেরা মিনির জন্য সহজ URL রিডিং
+    var q = window.location.search;
+    if(q.indexOf('s1=') > -1 && q.indexOf('s2=') > -1) {
+        var params = q.substring(1).split('&');
+        var s1 = params[0].split('=')[1];
+        var s2 = params[1].split('=')[1];
+        
+        if(s1 && s2) {
+            _un = decodeURIComponent(s1).split('-')[0];
+            var p = [decodeURIComponent(s1), decodeURIComponent(s2)].sort();
+            _uid = p[0] + p[1];
+            
+            document.getElementById('l_area').style.display = 'none';
+            document.getElementById('chat_box').style.display = 'block';
+            load();
+        }
+    }
+
+    function send() {
+        var t = document.getElementById('m_text').value;
+        if(t == "") return;
+        var m = new Date().getFullYear() + "_" + (new Date().getMonth() + 1);
+        var x = new XMLHttpRequest();
+        x.open("POST", _base + _uid + "/" + m + ".json", true);
+        x.onreadystatechange = function() { if(x.readyState == 4) load(); };
+        x.send(JSON.stringify({"u":_un, "m":t}));
+        document.getElementById('m_text').value = "";
+    }
+
+    function load() {
+        if(_uid == "") return;
+        var m = new Date().getFullYear() + "_" + (new Date().getMonth() + 1);
+        var x = new XMLHttpRequest();
+        x.open("GET", _base + _uid + "/" + m + ".json", true);
+        x.onreadystatechange = function() {
+            if(x.readyState == 4 && x.status == 200) {
+                var res = JSON.parse(x.responseText);
+                var h = "";
+                for(var k in res) { 
+                    var type = (res[k].u == _un) ? "sent" : "recd";
+                    h = "<div class='msg-row'><div class='bubble "+type+"'><span class='u-name'>"+res[k].u+"</span>"+res[k].m+"</div></div>" + h; 
+                }
+                document.getElementById('messages').innerHTML = h || "<center>No messages</center>";
+            }
+        };
+        x.send();
+    }
+
+    function logout() {
+        window.location.href = window.location.pathname;
+    }
+</script>
+</body>
+</html>
     <div class="top">
         <input type="text" id="m_text" class="msg-in" placeholder="Write...">
         <button class="send-btn" onclick="send()">SEND</button>
