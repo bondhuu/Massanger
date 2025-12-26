@@ -1,41 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bondhu Messenger</title>
     <style>
-        body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; }
-        .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; position: sticky; top: 0; z-index: 1000; }
+        body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; font-size: 12px; }
+        .header { background: #075e54; color: #fff; padding: 8px; font-weight: bold; text-align: center; }
         
-        /* Login Area */
-        .login-box { background: #fff; margin: 50px 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); text-align: center; }
-        .in { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-        .btn { background: #25d366; color: #fff; padding: 12px; width: 95%; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
+        .login-box { background: #fff; margin: 10px; padding: 10px; border: 1px solid #ccc; text-align: center; }
+        .in { width: 85%; padding: 5px; margin: 5px 0; border: 1px solid #999; }
+        .btn { background: #25d366; color: #fff; padding: 8px; width: 90%; font-weight: bold; border: none; }
 
-        /* Sticky Input Area */
         .top-locked { 
             background: #f0f0f0; 
-            padding: 10px; 
-            border-bottom: 2px solid #ccc; 
-            position: sticky; 
-            top: 40px; 
-            z-index: 100;
+            padding: 8px; 
+            border-bottom: 1px solid #ccc; 
+            position: sticky; top: 0; z-index: 100;
         }
-        .msg-in { width: 65%; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
-        .send-btn { width: 25%; padding: 10px; background: #075e54; color: #fff; border: none; font-weight: bold; border-radius: 20px; margin-left: 5px; cursor: pointer; }
+        .msg-in { width: 60%; padding: 6px; border: 1px solid #ccc; }
+        .send-btn { width: 30%; padding: 6px; background: #075e54; color: #fff; border: none; font-weight: bold; }
 
-        /* Tools & Logout */
-        .tools { font-size: 12px; margin-top: 8px; background: #fff; padding: 5px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .exit-btn { background: #ff3b30; color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+        .tools { font-size: 10px; margin-top: 5px; background: #fff; padding: 3px; border: 1px solid #ddd; }
+        .exit-btn { background: red; color: white; border: none; padding: 2px 5px; cursor: pointer; }
 
-        /* Message List */
-        #messages { padding: 15px; display: flex; flex-direction: column; }
-        .msg-row { width: 100%; margin-bottom: 10px; overflow: hidden; }
-        .bubble { padding: 10px 15px; border-radius: 15px; display: inline-block; max-width: 75%; word-wrap: break-word; font-size: 14px; position: relative; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .sent { background: #dcf8c6; align-self: flex-end; float: right; border-top-right-radius: 2px; } 
-        .recd { background: #ffffff; align-self: flex-start; float: left; border-top-left-radius: 2px; }
-        .u-name { font-size: 11px; color: #075e54; font-weight: bold; display: block; margin-bottom: 3px; }
+        #messages { padding: 8px; }
+        .msg-row { width: 100%; margin-bottom: 5px; clear: both; display: block; overflow: hidden; }
+        .bubble { padding: 6px; border-radius: 4px; border: 1px solid #bbb; display: inline-block; max-width: 80%; word-wrap: break-word; }
+        .sent { background: #dcf8c6; float: right; } 
+        .recd { background: #ffffff; float: left; }
+        .u-name { font-size: 9px; color: #075e54; font-weight: bold; display: block; }
     </style>
 </head>
 <body>
@@ -43,130 +36,113 @@
 <div class="header">Bondhu Messenger</div>
 
 <div id="l_area" class="login-box">
-    <h3 style="margin-top:0;">Welcome</h3>
-    <input type="text" id="id1" class="in" placeholder="My ID-Pin">
-    <input type="text" id="id2" class="in" placeholder="Friend ID-Pin">
+    <b>Login</b><br>
+    <input type="text" id="id1" class="in" placeholder="My ID-Pin"><br>
+    <input type="text" id="id2" class="in" placeholder="Friend ID-Pin"><br>
     <button class="btn" onclick="start()">LOGIN</button>
 </div>
 
 <div id="chat_box" style="display:none;">
     <div class="top-locked">
-        <div style="display: flex; align-items: center;">
-            <input type="text" id="m_text" class="msg-in" placeholder="Type a message...">
-            <button class="send-btn" onclick="send()">SEND</button>
-        </div>
-        
+        <input type="text" id="m_text" class="msg-in" placeholder="Message...">
+        <button class="send-btn" onclick="send()">SEND</button>
         <div class="tools">
-            <span>History: <select id="m_sel" onchange="load()"></select></span>
+            History: <select id="m_sel" onchange="load()"></select>
             <button class="exit-btn" onclick="logout()">Exit</button>
         </div>
     </div>
-
     <div id="messages"></div>
 </div>
 
 <script>
     var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
-    var _uid = ""; 
-    var _un = "";
+    var _uid = ""; var _un = "";
+
+    // জাভা ফোনের জন্য কুকি ফাংশন
+    function setCookie(n, v) { document.cookie = n + "=" + v + "; path=/; expires=Fri, 31 Dec 2030 23:59:59 GMT"; }
+    function getCookie(n) {
+        var name = n + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i].trim();
+            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+        }
+        return "";
+    }
 
     window.onload = function() {
-        var savedUid = localStorage.getItem("bondhu_uid");
-        var savedUn = localStorage.getItem("bondhu_un");
-        
-        if (savedUid && savedUn) {
-            _uid = savedUid;
-            _un = savedUn;
-            showChat();
+        var sUid = getCookie("b_uid");
+        var sUn = getCookie("b_un");
+        if(sUid != "" && sUn != "") {
+            _uid = sUid; _un = sUn;
+            initChat();
         }
     };
 
     function start() {
-        var a = document.getElementById('id1').value.trim();
-        var b = document.getElementById('id2').value.trim();
-        
-        if(a == "" || b == "") return;
-
-        var p = [a, b].sort();
-        _uid = btoa(p[0] + p[1]).replace(/=/g, "");
+        var a = document.getElementById('id1').value;
+        var b = document.getElementById('id2').value;
+        if(a=="" || b=="") return;
+        var p = [a,b].sort();
+        _uid = btoa(p[0]+p[1]).replace(/=/g, "");
         _un = a.split('-')[0];
-
-        localStorage.setItem("bondhu_uid", _uid);
-        localStorage.setItem("bondhu_un", _un);
-
-        showChat();
+        setCookie("b_uid", _uid);
+        setCookie("b_un", _un);
+        initChat();
     }
 
-    function showChat() {
-        document.getElementById('l_area').style.display = 'none';
-        document.getElementById('chat_box').style.display = 'block';
-        
-        setupMonths();
-        load();
-        setInterval(load, 10000);
-    }
-
-    function setupMonths() {
+    function initChat() {
+        document.getElementById('l_area').style.display='none';
+        document.getElementById('chat_box').style.display='block';
         var sel = document.getElementById('m_sel');
         sel.innerHTML = "";
-        var d = new Date(); 
-        var s = new Date(2025, 0, 1);
-        
-        while(s <= d) {
-            var v = s.getFullYear() + "_" + (s.getMonth() + 1);
+        var d = new Date(); var s = new Date(2025,0,1);
+        while(s<=d){
+            var v = s.getFullYear()+"_"+(s.getMonth()+1);
             var o = document.createElement('option');
-            o.value = v; 
-            o.innerHTML = s.toLocaleString('default', { month: 'short', year: 'numeric' });
+            o.value=v; o.innerHTML=v;
             sel.insertBefore(o, sel.firstChild);
-            s.setMonth(s.getMonth() + 1);
+            s.setMonth(s.getMonth()+1);
         }
+        load();
+        setInterval(load, 15000); // জাভা ফোনে ১০ এর বদলে ১৫ সেকেন্ড ইন্টারভাল ভালো
     }
 
     function send() {
-        var t = document.getElementById('m_text').value.trim();
+        var t = document.getElementById('m_text').value;
         var m = document.getElementById('m_sel').value;
-        if(t == "") return;
-
+        if(t=="") return;
         var x = new XMLHttpRequest();
-        x.open("POST", atob(_0xdb) + _uid + "/" + m + ".json", true);
-        x.onload = function() {
-            if (x.status == 200) {
-                document.getElementById('m_text').value = "";
-                load();
-            }
-        };
-        x.send(JSON.stringify({ "u": _un, "m": t }));
+        x.open("POST", atob(_0xdb)+_uid+"/"+m+".json", true);
+        x.onreadystatechange = function() { if(x.readyState==4) load(); };
+        x.send(JSON.stringify({"u":_un,"m":t}));
+        document.getElementById('m_text').value="";
     }
 
     function load() {
-        if(_uid == "") return;
+        if(_uid=="") return;
         var m = document.getElementById('m_sel').value;
         var x = new XMLHttpRequest();
-        x.open("GET", atob(_0xdb) + _uid + "/" + m + ".json", true);
+        x.open("GET", atob(_0xdb)+_uid+"/"+m+".json", true);
         x.onreadystatechange = function() {
-            if(x.readyState == 4 && x.status == 200) {
+            if(x.readyState==4 && x.status==200){
                 var res = JSON.parse(x.responseText);
                 var h = "";
-                if(!res) {
-                    document.getElementById('messages').innerHTML = "<center style='padding:50px; color:gray;'>No messages</center>";
-                    return;
-                }
-                
-                for(var k in res) { 
+                for(var k in res){ 
                     var type = (res[k].u == _un) ? "sent" : "recd";
-                    h = "<div class='msg-row'><div class='bubble " + type + "'><span class='u-name'>" + res[k].u + "</span>" + res[k].m + "</div></div>" + h; 
+                    h = "<div class='msg-row'><div class='bubble "+type+"'><span class='u-name'>"+res[k].u+"</span>"+res[k].m+"</div></div>" + h; 
                 }
-                document.getElementById('messages').innerHTML = h;
+                document.getElementById('messages').innerHTML = h || "<center>No Msg</center>";
             }
         };
         x.send();
     }
 
     function logout() {
-        localStorage.clear();
+        document.cookie = "b_uid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "b_un=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         location.reload();
     }
 </script>
-
 </body>
 </html>
