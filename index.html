@@ -2,33 +2,25 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Bondhu Messenger</title>
+    <title>Bondhu - Java Edition</title>
     <style>
-        body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; font-size: 12px; }
-        .header { background: #075e54; color: #fff; padding: 8px; font-weight: bold; text-align: center; }
+        body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: Arial, sans-serif; font-size: 13px; }
+        .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; }
+        .login-box { background: #fff; margin: 15px; padding: 15px; border: 1px solid #999; text-align: center; }
+        .in { width: 85%; padding: 6px; margin: 8px 0; border: 1px solid #777; }
+        .btn { background: #25d366; color: #fff; padding: 10px; width: 90%; font-weight: bold; border: none; }
         
-        .login-box { background: #fff; margin: 10px; padding: 10px; border: 1px solid #ccc; text-align: center; }
-        .in { width: 85%; padding: 5px; margin: 5px 0; border: 1px solid #999; }
-        .btn { background: #25d366; color: #fff; padding: 8px; width: 90%; font-weight: bold; border: none; }
-
-        .top-locked { 
-            background: #f0f0f0; 
-            padding: 8px; 
-            border-bottom: 1px solid #ccc; 
-            position: sticky; top: 0; z-index: 100;
-        }
+        .chat-area { display: none; }
+        .top-locked { background: #f0f0f0; padding: 8px; border-bottom: 2px solid #ccc; }
         .msg-in { width: 60%; padding: 6px; border: 1px solid #ccc; }
-        .send-btn { width: 30%; padding: 6px; background: #075e54; color: #fff; border: none; font-weight: bold; }
-
-        .tools { font-size: 10px; margin-top: 5px; background: #fff; padding: 3px; border: 1px solid #ddd; }
-        .exit-btn { background: red; color: white; border: none; padding: 2px 5px; cursor: pointer; }
-
-        #messages { padding: 8px; }
-        .msg-row { width: 100%; margin-bottom: 5px; clear: both; display: block; overflow: hidden; }
-        .bubble { padding: 6px; border-radius: 4px; border: 1px solid #bbb; display: inline-block; max-width: 80%; word-wrap: break-word; }
-        .sent { background: #dcf8c6; float: right; } 
+        .send-btn { width: 30%; padding: 7px; background: #075e54; color: #fff; border: none; font-weight: bold; }
+        
+        #messages { padding: 10px; }
+        .msg-row { width: 100%; margin-bottom: 10px; clear: both; display: block; overflow: hidden; }
+        .bubble { padding: 8px; border-radius: 5px; border: 1px solid #bbb; display: inline-block; max-width: 80%; }
+        .sent { background: #dcf8c6; float: right; text-align: right; } 
         .recd { background: #ffffff; float: left; }
-        .u-name { font-size: 9px; color: #075e54; font-weight: bold; display: block; }
+        .u-name { font-size: 10px; color: #075e54; font-weight: bold; display: block; }
     </style>
 </head>
 <body>
@@ -36,43 +28,56 @@
 <div class="header">Bondhu Messenger</div>
 
 <div id="l_area" class="login-box">
-    <b>Login</b><br>
+    <b>LOGIN</b><br>
     <input type="text" id="id1" class="in" placeholder="My ID-Pin"><br>
     <input type="text" id="id2" class="in" placeholder="Friend ID-Pin"><br>
-    <button class="btn" onclick="start()">LOGIN</button>
+    <button class="btn" onclick="start()">START CHAT</button>
 </div>
 
-<div id="chat_box" style="display:none;">
+<div id="chat_box" class="chat-area">
     <div class="top-locked">
         <input type="text" id="m_text" class="msg-in" placeholder="Message...">
         <button class="send-btn" onclick="send()">SEND</button>
-        <div class="tools">
+        <div style="font-size:11px; margin-top:5px;">
             History: <select id="m_sel" onchange="load()"></select>
-            <button class="exit-btn" onclick="logout()">Exit</button>
+            <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 5px;">Logout</button>
         </div>
     </div>
     <div id="messages"></div>
 </div>
 
 <script>
-    var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
+    // Firebase URL Decoded for older browsers
+    var _base = "https://bondhu-489ea-default-rtdi.firebaseio.com/secure_chats/";
     var _uid = ""; var _un = "";
 
-    // জাভা ফোনের জন্য কুকি ফাংশন
-    function setCookie(n, v) { document.cookie = n + "=" + v + "; path=/; expires=Fri, 31 Dec 2030 23:59:59 GMT"; }
-    function getCookie(n) {
+    // জাভা ফোনের জন্য বিশেষ কুকি ফাংশন
+    function setC(n, v) { document.cookie = n + "=" + v + "; path=/; expires=Fri, 31 Dec 2030 23:59:59 GMT"; }
+    function getC(n) {
         var name = n + "=";
         var ca = document.cookie.split(';');
         for(var i=0; i<ca.length; i++) {
-            var c = ca[i].trim();
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1);
             if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
         }
         return "";
     }
 
+    // চ্যাট আইডি তৈরির সাধারণ ফাংশন (btoa ছাড়া)
+    function makeId(s1, s2) {
+        var p = [s1, s2].sort();
+        var raw = p[0] + p[1];
+        var out = "";
+        for (var i=0; i<raw.length; i++) {
+            out += raw.charCodeAt(i); // অক্ষরের কোড দিয়ে আইডি বানানো
+        }
+        return out;
+    }
+
     window.onload = function() {
-        var sUid = getCookie("b_uid");
-        var sUn = getCookie("b_un");
+        var sUid = getC("b_uid");
+        var sUn = getC("b_un");
         if(sUid != "" && sUn != "") {
             _uid = sUid; _un = sUn;
             initChat();
@@ -82,30 +87,34 @@
     function start() {
         var a = document.getElementById('id1').value;
         var b = document.getElementById('id2').value;
-        if(a=="" || b=="") return;
-        var p = [a,b].sort();
-        _uid = btoa(p[0]+p[1]).replace(/=/g, "");
+        if(a=="" || b=="") { alert("Enter IDs"); return; }
+        
+        _uid = makeId(a, b);
         _un = a.split('-')[0];
-        setCookie("b_uid", _uid);
-        setCookie("b_un", _un);
+        
+        setC("b_uid", _uid);
+        setC("b_un", _un);
         initChat();
     }
 
     function initChat() {
         document.getElementById('l_area').style.display='none';
         document.getElementById('chat_box').style.display='block';
+        
         var sel = document.getElementById('m_sel');
         sel.innerHTML = "";
-        var d = new Date(); var s = new Date(2025,0,1);
-        while(s<=d){
-            var v = s.getFullYear()+"_"+(s.getMonth()+1);
+        var d = new Date();
+        for(var i=0; i<5; i++) { // গত ৫ মাসের লিস্ট
+            var m = (d.getMonth() + 1);
+            var y = d.getFullYear();
+            var v = y + "_" + m;
             var o = document.createElement('option');
-            o.value=v; o.innerHTML=v;
-            sel.insertBefore(o, sel.firstChild);
-            s.setMonth(s.getMonth()+1);
+            o.value = v; o.innerHTML = v;
+            sel.appendChild(o);
+            d.setMonth(d.getMonth() - 1);
         }
         load();
-        setInterval(load, 15000); // জাভা ফোনে ১০ এর বদলে ১৫ সেকেন্ড ইন্টারভাল ভালো
+        setInterval(load, 15000); // অটো রিফ্রেশ
     }
 
     function send() {
@@ -113,7 +122,7 @@
         var m = document.getElementById('m_sel').value;
         if(t=="") return;
         var x = new XMLHttpRequest();
-        x.open("POST", atob(_0xdb)+_uid+"/"+m+".json", true);
+        x.open("POST", _base + _uid + "/" + m + ".json", true);
         x.onreadystatechange = function() { if(x.readyState==4) load(); };
         x.send(JSON.stringify({"u":_un,"m":t}));
         document.getElementById('m_text').value="";
@@ -123,7 +132,7 @@
         if(_uid=="") return;
         var m = document.getElementById('m_sel').value;
         var x = new XMLHttpRequest();
-        x.open("GET", atob(_0xdb)+_uid+"/"+m+".json", true);
+        x.open("GET", _base + _uid + "/" + m + ".json", true);
         x.onreadystatechange = function() {
             if(x.readyState==4 && x.status==200){
                 var res = JSON.parse(x.responseText);
@@ -132,7 +141,7 @@
                     var type = (res[k].u == _un) ? "sent" : "recd";
                     h = "<div class='msg-row'><div class='bubble "+type+"'><span class='u-name'>"+res[k].u+"</span>"+res[k].m+"</div></div>" + h; 
                 }
-                document.getElementById('messages').innerHTML = h || "<center>No Msg</center>";
+                document.getElementById('messages').innerHTML = h || "<center>No Messages</center>";
             }
         };
         x.send();
