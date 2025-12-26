@@ -2,24 +2,21 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Bondhu - Simple</title>
+    <title>Bondhu Messenger</title>
     <style>
         body { background-color: #e5ddd5; margin: 0; padding: 0; font-family: sans-serif; font-size: 13px; }
         .header { background: #075e54; color: #fff; padding: 10px; font-weight: bold; text-align: center; }
-        .login-box { background: #fff; margin: 10px; padding: 15px; border: 1px solid #ccc; text-align: center; }
+        .login-box { background: #fff; margin: 15px; padding: 15px; border: 1px solid #ccc; text-align: center; }
         .in { width: 90%; padding: 8px; margin: 5px 0; border: 1px solid #999; }
         .btn { background: #25d366; color: #fff; padding: 10px; width: 95%; font-weight: bold; border: none; }
 
-        .top-locked { 
-            background: #f0f0f0; padding: 10px; border-bottom: 2px solid #ccc; 
-            position: sticky; top: 0; z-index: 100;
-        }
+        .top-locked { background: #f0f0f0; padding: 10px; border-bottom: 2px solid #ccc; position: sticky; top: 0; z-index: 100; }
         .msg-in { width: 60%; padding: 8px; border: 1px solid #ccc; }
         .send-btn { width: 30%; padding: 8px; background: #075e54; color: #fff; border: none; font-weight: bold; }
 
         #messages { padding: 10px; }
         .msg-row { width: 100%; margin-bottom: 8px; clear: both; overflow: hidden; }
-        .bubble { padding: 8px; border-radius: 5px; border: 1px solid #bbb; display: inline-block; max-width: 80%; word-wrap: break-word; }
+        .bubble { padding: 8px; border-radius: 5px; border: 1px solid #bbb; display: inline-block; max-width: 80%; }
         .sent { background: #dcf8c6; float: right; } 
         .recd { background: #ffffff; float: left; }
         .u-name { font-size: 10px; color: #075e54; font-weight: bold; display: block; }
@@ -41,7 +38,7 @@
         <input type="text" id="m_text" class="msg-in" placeholder="Write...">
         <button class="send-btn" onclick="send()">SEND</button>
         <div style="font-size:11px; margin-top:5px;">
-            Month: <select id="m_sel" onchange="load()"></select>
+            History: <select id="m_sel" onchange="load()"></select>
             <button onclick="logout()" style="float:right; background:red; color:white; border:none; padding:2px 5px;">Exit</button>
         </div>
     </div>
@@ -52,24 +49,19 @@
     var _0xdb = "aHR0cHM6Ly9ib25kaHUtNDg5ZWEtZGVmYXVsdC1ydGRiLmZpcmViYXNlaW8uY29tL3NlY3VyZV9jaGF0cy8=";
     var _uid = ""; var _un = "";
 
-    // জাভা ফোনের জন্য কুকি রিড/রাইট
-    function setCK(n, v) { document.cookie = n + "=" + v + "; path=/; expires=Fri, 31 Dec 2030 23:59:59 GMT"; }
-    function getCK(n) {
-        var name = n + "=";
-        var ca = document.cookie.split(';');
-        for(var i=0; i<ca.length; i++) {
-            var c = ca[i].trim();
-            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
-        }
-        return "";
+    // URL থেকে ডাটা পড়ার ফাংশন
+    function getParam(name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        return (results == null) ? null : results[1] || 0;
     }
 
-    // অটো লগইন চেক
     window.onload = function() {
-        var c_uid = getCK("u_id");
-        var c_un = getCK("u_n");
-        if(c_uid != "" && c_un != "") {
-            _uid = c_uid; _un = c_un;
+        var u = getParam('u'); // URL এ u আছে কিনা দেখবে
+        var n = getParam('n'); // URL এ n আছে কিনা দেখবে
+        
+        if(u && n) {
+            _uid = u;
+            _un = n;
             showUI();
         }
     };
@@ -79,14 +71,12 @@
         var b = document.getElementById('id2').value;
         if(a==""||b=="") return;
         
-        // আইডি তৈরির সময় btoa ব্যবহার না করে সাধারণ যোগফল ব্যবহার
         var p = [a,b].sort();
-        _uid = p[0] + p[1]; // একদম সহজ আইডি
-        _un = a.split('-')[0];
+        var temp_uid = p[0] + p[1];
+        var temp_un = a.split('-')[0];
 
-        setCK("u_id", _uid);
-        setCK("u_n", _un);
-        showUI();
+        // লগইন করার পর URL পরিবর্তন করে দিবে (যাতে রিলোড দিলে ডাটা থাকে)
+        window.location.href = window.location.pathname + "?u=" + temp_uid + "&n=" + temp_un;
     }
 
     function showUI() {
@@ -94,7 +84,6 @@
         document.getElementById('chat_box').style.display='block';
         
         var sel = document.getElementById('m_sel');
-        sel.innerHTML = "";
         var d = new Date();
         var v = d.getFullYear()+"_"+(d.getMonth()+1);
         var o = document.createElement('option');
@@ -102,7 +91,7 @@
         sel.appendChild(o);
         
         load();
-        setInterval(load, 12000);
+        setInterval(load, 10000);
     }
 
     function send() {
@@ -136,9 +125,7 @@
     }
 
     function logout() {
-        document.cookie = "u_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = "u_n=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        location.reload();
+        window.location.href = window.location.pathname; // URL ক্লিয়ার করে লগআউট
     }
 </script>
 </body>
